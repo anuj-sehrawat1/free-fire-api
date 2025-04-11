@@ -102,7 +102,7 @@
 
   <h2>Deploying to Vercel</h2>
   <p>API is pre-configured for Vercel. To deploy:</p>
-  <pre><code>vercel --prod</code></pre>
+  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fanuj-sehrawat1%2Ffree-fire-api&project-name=free-fire-api&repository-name=free-fire-api)
 
   <h2>Credits</h2>
   <p>Developed by <strong>Anuj Sehrawat</strong><br/>
