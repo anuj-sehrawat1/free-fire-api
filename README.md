@@ -1,5 +1,6 @@
 <body>
   <h1>Free Fire Player Info API</h1>
+  [!WARNING]
   <p>Get public data of any Free Fire player using their UID. This API decrypts and parses Free Fire's internal responses to provide data like player name, level, likes, Booyah pass level, bio, guild details, etc.</p>
 
   <p><strong>Author:</strong> ANUJ SEHRAWAT<br/>
@@ -101,12 +102,28 @@
   </table>
 
   <h2>Deploying to Vercel</h2>
-  <p>API is pre-configured for Vercel. To deploy:</p>
-  [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fanuj-sehrawat1%2Ffree-fire-api&project-name=free-fire-api&repository-name=free-fire-api)
+  <p>API is pre-configured for Vercel.</p>
+
+  <h3>Option 1: One-Click Deploy</h3>
+  <p>
+    <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fanuj-sehrawat1%2Ffree-fire-api&project-name=free-fire-api&repository-name=free-fire-api" target="_blank">
+      <strong>→ Click here to Deploy on Vercel</strong>
+    </a>
+  </p>
+
+  <h3>Option 2: Manual Deployment</h3>
+  <ol>
+    <li>Fork or clone this repo</li>
+    <li>Install Vercel CLI:<br/>
+      <code>npm install -g vercel</code>
+    </li>
+    <li>Run this to deploy:<br/>
+      <code>vercel --prod</code>
+    </li>
+  </ol>
 
   <h2>Credits</h2>
   <p>Developed by <strong>Anuj Sehrawat</strong><br/>
   Telegram: <a href="https://t.me/tg_anujsehrawat">@tg_anujsehrawat</a><br/>
   Instagram: <a href="https://instagram.com/a9x2k">@a9x2k</a></p>
 </body>
-</html>
