@@ -1,6 +1,5 @@
 <body>
   <h1>Free Fire Player Info API</h1>
-  [!WARNING]
   <p>Get public data of any Free Fire player using their UID. This API decrypts and parses Free Fire's internal responses to provide data like player name, level, likes, Booyah pass level, bio, guild details, etc.</p>
 
   <p><strong>Author:</strong> ANUJ SEHRAWAT<br/>
