@@ -12,22 +12,26 @@ app = Flask(__name__)
 # FF INFO ACC 
 DEFAULT_UID = "3197059560"
 DEFAULT_PASS = "3EC146CD4EEF7A640F2967B06D7F4413BD4FB37382E0ED260E214E8BACD96734"
-JWT_GEN_URL = "https://ariflexlabs-jwt-gen.onrender.com/fetch-token"
+# JWT_GEN_URL = "https://ariflexlabs-jwt-gen.onrender.com/fetch-token"
 
 # GET JWT
 def get_jwt():
     try:
-        params = {
-            'uid': DEFAULT_UID,
-            'password': DEFAULT_PASS
-        }
-        response = requests.get(JWT_GEN_URL, params=params)
-        if response.status_code == 200:
-            jwt_data = response.json()
-            return jwt_data.get("JWT TOKEN")
-        return None
+        url = f"https://freefireserver.c0m.in/oauth/account:login?data={DEFAULT_UID}:{DEFAULT_PASS}"
+        
+        response = requests.get(url, timeout=10)
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+
+        # JWT token response ke "8" key me hota hai
+        jwt_token = data.get("8")
+        return jwt_token
+
     except Exception as e:
         return None
+
         
 #DONT EDIT
 def Encrypt_ID(x):
