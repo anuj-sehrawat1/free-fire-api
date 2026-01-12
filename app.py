@@ -90,7 +90,7 @@ def decode_proto(hex_data):
 
 
 # ================= ENCRYPT ONLY API =================
-@app.route("/api/encrypt", methods=["GET"])
+@app.route("/encrypt", methods=["GET"])
 def encrypt_only():
     uid = request.args.get("uid")
     if not uid or not uid.isdigit():
@@ -110,7 +110,7 @@ def encrypt_only():
 
 
 # ================= PLAYER INFO API =================
-@app.route("/api/player-info", methods=["GET"])
+@app.route("/player-info", methods=["GET"])
 def player_info():
     pid = request.args.get("id")
     if not pid:
