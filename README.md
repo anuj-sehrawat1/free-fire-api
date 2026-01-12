@@ -8,6 +8,13 @@
 
   <hr/>
 
+  <h2>⚠️ Project Status: Deprecated</h2>
+
+This API was built for learning purposes.
+The Free Fire endpoints are no longer active due to upstream changes.
+Architecture and implementation remain relevant.
+
+
   <h2>Demo</h2>
   <p>Try the API live:<br/>
   <a href="https://anuj-free-fire-api.vercel.app/api/player-info?id=2396094646" target="_blank">
