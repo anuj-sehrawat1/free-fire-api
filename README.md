@@ -17,7 +17,7 @@ Architecture and implementation remain relevant.
 
   <h2>Demo</h2>
   <p>Try the API live:<br/>
-  <a href="https://anuj-free-fire-api.vercel.app/api/player-info?id=2396094646" target="_blank">
+  <a href="https://anuj-free-fire-api.vercel.app/player-info?id=2396094646" target="_blank">
     https://anuj-free-fire-api.vercel.app/api/player-info?id=2396094646
   </a></p>
 
