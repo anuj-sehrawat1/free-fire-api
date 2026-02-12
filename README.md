@@ -18,7 +18,7 @@ Architecture and implementation remain relevant.
   <h2>Demo</h2>
   <p>Try the API live:<br/>
   <a href="https://anuj-free-fire-api.vercel.app/player-info?id=2396094646" target="_blank">
-    https://anuj-free-fire-api.vercel.app/api/player-info?id=2396094646
+    https://anuj-free-fire-api.vercel.app/player-info?id=2396094646
   </a></p>
 
   <h2>How It Works</h2>
@@ -32,7 +32,7 @@ Architecture and implementation remain relevant.
   </ul>
 
   <h2>API Endpoint</h2>
-  <p><strong>GET</strong> <code>/api/player-info?id=&lt;PLAYER_UID&gt;</code></p>
+  <p><strong>GET</strong> <code>/player-info?id=&lt;PLAYER_UID&gt;</code></p>
 
   <h3>Query Parameters</h3>
   <table>
