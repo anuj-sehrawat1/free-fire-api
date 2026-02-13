@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import requests
 import binascii
 from Crypto.Cipher import AES
@@ -6,27 +7,30 @@ from Crypto.Util.Padding import pad
 from protobuf_decoder.protobuf_decoder import Parser
 from datetime import datetime
 import json
+import urllib3
+
+# SSL warnings disable karne ke liye (kyuki verify=False use ho raha hai)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
+CORS(app) # Postman ya Web se call karne par CORS error nahi aayega
 
 # ================= FF INFO ACCOUNT =================
 DEFAULT_UID = "4289924053"
 DEFAULT_PASS = "68C6CF86ED35E535144488384ED282C6C0E9597E9FE6A162DE03F6AF6D1B2B7C"
 
-
-# ================= JWT LOGIN =================
+# ================= JWT LOGIN (Fallback) =================
 def get_jwt():
     try:
         url = f"https://freefireserver.c0m.in/oauth/account:login?data={DEFAULT_UID}:{DEFAULT_PASS}"
         res = requests.get(url, timeout=10)
         if res.status_code != 200:
             return None
-        return res.json().get("8")  # JWT
+        return res.json().get("8")
     except:
         return None
 
-
-# ================= DONT EDIT =================
+# ================= ENCRYPTION LOGIC =================
 def Encrypt_ID(x):
     x = int(x)
     dec = ['80','81','82','83','84','85','86','87','88','89','8a','8b','8c','8d','8e','8f',
@@ -63,17 +67,15 @@ def Encrypt_ID(x):
                 z = (y - int(y)) * 128
                 n = (z - int(z)) * 128
                 return dec[int(n)] + dec[int(z)] + dec[int(y)] + xxx[int(x)]
+    return ""
 
-
-# ================= AES ENCRYPT =================
 def encrypt_api(plain_hex):
     key = bytes([89,103,38,116,99,37,68,69,117,104,54,37,90,99,94,56])
     iv  = bytes([54,111,121,90,68,114,50,50,69,51,121,99,104,106,77,37])
     cipher = AES.new(key, AES.MODE_CBC, iv)
     return cipher.encrypt(pad(bytes.fromhex(plain_hex), 16)).hex()
 
-
-# ================= PROTO PARSER =================
+# ================= DECODING LOGIC =================
 def parse_results(results):
     out = {}
     for r in results:
@@ -83,45 +85,39 @@ def parse_results(results):
             out[r.field] = {"data": r.data}
     return out
 
-
 def decode_proto(hex_data):
     parsed = Parser().parse(hex_data)
     return json.dumps(parse_results(parsed))
 
+# ================= ENDPOINTS =================
 
-# ================= ENCRYPT ONLY API =================
 @app.route("/encrypt", methods=["GET"])
 def encrypt_only():
     uid = request.args.get("uid")
     if not uid or not uid.isdigit():
         return jsonify({"status": "error", "message": "valid uid required"}), 400
-
     enc_id = Encrypt_ID(uid)
     proto = f"08{enc_id}1007"
     aes = encrypt_api(proto)
+    return jsonify({"status": "success", "uid": uid, "aes_encrypted_payload_hex": aes})
 
-    return jsonify({
-        "status": "success",
-        "uid": uid,
-        "encrypted_id": enc_id,
-        "protobuf_hex": proto,
-        "aes_encrypted_payload_hex": aes
-    })
-
-
-# ================= PLAYER INFO API =================
 @app.route("/player-info", methods=["GET"])
 def player_info():
     pid = request.args.get("id")
     if not pid:
         return jsonify({"status": "error", "message": "id required"}), 400
 
-    jwt = get_jwt()
+    # JWT Token checking: Header se lo, warna fallback to get_jwt()
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        jwt = auth_header.split(" ")[1]
+    else:
+        jwt = get_jwt()
+
     if not jwt:
-        return jsonify({"status": "error", "message": "jwt failed"}), 500
+        return jsonify({"status": "error", "message": "No JWT token provided or found"}), 401
 
     payload = bytes.fromhex(encrypt_api(f"08{Encrypt_ID(pid)}1007"))
-
     headers = {
         "Authorization": f"Bearer {jwt}",
         "Content-Type": "application/x-www-form-urlencoded",
@@ -129,26 +125,29 @@ def player_info():
         "ReleaseVersion": "OB48"
     }
 
-    r = requests.post(
-        "https://client.ind.freefiremobile.com/GetPlayerPersonalShow",
-        headers=headers,
-        data=payload,
-        verify=False
-    )
+    try:
+        r = requests.post(
+            "https://client.ind.freefiremobile.com/GetPlayerPersonalShow",
+            headers=headers,
+            data=payload,
+            verify=False,
+            timeout=15
+        )
+        if r.status_code != 200:
+            return jsonify({"status": "error", "code": r.status_code, "msg": "Garena server error"})
 
-    if r.status_code != 200:
-        return jsonify({"status": "error", "code": r.status_code})
-
-    data = json.loads(decode_proto(binascii.hexlify(r.content).decode()))
-
-    return jsonify({
-        "status": "success",
-        "name": data["1"]["data"]["3"]["data"],
-        "level": data["1"]["data"]["6"]["data"],
-        "likes": data["1"]["data"]["21"]["data"],
-        "server": data["1"]["data"]["5"]["data"]
-    })
-
+        data = json.loads(decode_proto(binascii.hexlify(r.content).decode()))
+        
+        # Result mapping
+        return jsonify({
+            "status": "success",
+            "name": data.get("1", {}).get("data", {}).get("3", {}).get("data", "Unknown"),
+            "level": data.get("1", {}).get("data", {}).get("6", {}).get("data", 0),
+            "likes": data.get("1", {}).get("data", {}).get("21", {}).get("data", 0),
+            "server": data.get("1", {}).get("data", {}).get("5", {}).get("data", "Unknown")
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
